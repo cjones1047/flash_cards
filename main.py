@@ -8,14 +8,13 @@ timer = ""
 
 
 def flip_card():
-    window.after_cancel(timer)
     # get English translation of shown French word
     french_word = card.itemcget(word, "text")
     word_row = word_df.loc[word_df["French"] == french_word]
     english_word = word_row["English"].item()
     # flip card over
-    card.itemconfig(language, text="English")
-    card.itemconfig(word, text=english_word)
+    card.itemconfig(language, text="English", fill="white")
+    card.itemconfig(word, text=english_word, fill="white")
     card.itemconfig(card_side, image=card_back_img)
 
 
@@ -28,9 +27,15 @@ def countdown(seconds_left):
 
 
 def pick_word():
+    # handle user clicking either button before timer expires
+    try:
+        window.after_cancel(timer)
+    except ValueError:
+        pass
+    # pick new word for card
     word_picked = choice(word_dict)["French"]
-    card.itemconfig(language, text="French")
-    card.itemconfig(word, text=word_picked)
+    card.itemconfig(language, text="French", fill="black")
+    card.itemconfig(word, text=word_picked, fill="black")
     card.itemconfig(card_side, image=card_front_img)
     global STARTING_SECONDS
     countdown(STARTING_SECONDS)
