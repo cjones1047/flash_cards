@@ -27,6 +27,7 @@ def countdown(seconds_left):
 
 
 def pick_word():
+    global timer
     # handle user clicking either button before timer expires
     try:
         window.after_cancel(timer)
@@ -38,7 +39,11 @@ def pick_word():
     card.itemconfig(word, text=word_picked, fill="black")
     card.itemconfig(card_side, image=card_front_img)
     global STARTING_SECONDS
-    countdown(STARTING_SECONDS)
+    timer = window.after(STARTING_SECONDS * 1000, flip_card)
+
+
+def remove_prev_word():
+    pass
 
 
 word_df = pd.read_csv("./data/french_words.csv")
@@ -57,7 +62,7 @@ word = card.create_text(400, 263, text="", font=("Arial", 60, "bold"))
 card.grid(column=0, row=0, columnspan=2)
 
 correct_img = PhotoImage(file="./images/right.png")
-correct_button = Button(image=correct_img, highlightbackground=BACKGROUND_COLOR, command=pick_word)
+correct_button = Button(image=correct_img, highlightbackground=BACKGROUND_COLOR, command=remove_prev_word)
 correct_button.grid(column=0, row=1)
 
 incorrect_img = PhotoImage(file="./images/wrong.png")
