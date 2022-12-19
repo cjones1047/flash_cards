@@ -1,10 +1,13 @@
 from tkinter import *
-from random import choice
 import pandas as pd
 
 BACKGROUND_COLOR = "#B1DDC6"
 STARTING_SECONDS = 5
 timer = ""
+
+
+def save_learned_words():
+    word_df.to_csv("./data/words_to_learn.csv", index=False)
 
 
 def get_french_word_row():
@@ -25,7 +28,7 @@ def flip_card():
 
 def pick_word():
     global timer
-    # handle user clicking either button before timer expires
+    # handle user clicking either button before timer expires and card flips
     try:
         window.after_cancel(timer)
     except ValueError:
@@ -40,22 +43,32 @@ def pick_word():
 
 
 def remove_word():
-    # delete row of previous word from df if the user answered correct
-    # consider what translation of word need be searched based on what side of the card is showing
+    """
+    delete row of previous word from df if the user answered correct
+    """
     global word_df
+    # consider what translation of word need be searched based on what side of the card is showing
     try:
         word_row_idx = get_french_word_row().index[0]
     except IndexError:
         english_word = card.itemcget(word, "text")
         word_row = word_df.loc[word_df["English"] == english_word]
         word_row_idx = word_row.index[0]
-    print(word_row_idx)
     word_df = word_df.drop(word_row_idx)
-    print(word_df)
+    # replace word_df with data from french_words.csv if all words have been learned
+    if len(word_df) == 0:
+        word_df = pd.read_csv("./data/french_words.csv")
+    save_learned_words()
     pick_word()
 
 
-word_df = pd.read_csv("./data/french_words.csv")
+# Try to extract csv file of learned words if existent, otherwise extract csv file with all words
+try:
+    word_df = pd.read_csv("./data/words_to_learn.csv")
+    print("df from words_to_learn")
+except FileNotFoundError:
+    word_df = pd.read_csv("./data/french_words.csv")
+    print("df from french_words")
 
 window = Tk()
 window.title("Flash Cards")
